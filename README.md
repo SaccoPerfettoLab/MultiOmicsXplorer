@@ -20,9 +20,7 @@ cd MultiOmicsXplorer
 
 ### 2. Install required R packages
 
-To install all the required packages run the 
-### install_packages.R code
-you'll find it in your app directory.
+To install all the required packages run the *install_packages.R* code.
 
 ### 3. Run the app
 
