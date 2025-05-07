@@ -1,2 +1,46 @@
+
+
 # MultiOmicsXplorer
-A R-based Shiny app to explore and analyze multi-omics data. 
+
+**MultiOmicsXplorer** is an interactive and user-friendly R Shiny application designed for the analysis and visualization of multi-omics cancer data. The app supports transcriptomics, phosphoproteomics, and inferred protein activity data, allowing researchers to explore pre-harmonized datasets (e.g., CPTAC) or upload their own.
+
+🌐 **Web application**:  
+👉 [https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/](https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/)
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/EleonoraMeo/MultiOmicsXplorer.git
+cd MultiOmicsXplorer
+```
+
+### 2. Install required R packages
+
+To install all the required packages run the 
+### install_packages.R code
+you'll find it in your app directory.
+
+### 3. Run the app
+
+Open `app.R` in RStudio and click the ▶️ "Run App" button, or run the following command:
+
+```r
+shiny::runApp()
+```
+
+## 3. Tutorial
+
+You can find the MultiOmicsXplorer tutorial at this link:
+[https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/tutorial.html]
+
+## License
+
+This project is licensed under the **MIT License**. See the `LICENSE` file for details.
+
+---
+
+
