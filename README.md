@@ -9,7 +9,7 @@
 
 🌐 **Web application**:  
 👉 [https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/](https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/)
-
+*It is completely free and does not require any registration.*
 ---
 
 ## Getting Started
