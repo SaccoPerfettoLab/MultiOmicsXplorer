@@ -2,7 +2,7 @@
 
 # MultiOmicsXplorer
 
-**MultiOmicsXplorer** is an interactive and user-friendly R Shiny application designed for the analysis and visualization of multi-omics cancer data. The app allows researchers to explore pre-harmonized datasets (e.g., CPTAC) or upload their own to extract protein activity.
+**MultiOmicsXplorer** is an interactive and user-friendly R Shiny application designed for the analysis and visualization of multi-omics cancer data. The app allows researchers to explore pre-harmonized dataset from CPTAC portal or upload their own to extract protein activity.
 
 🌐 **Web application**:  
 👉 [https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/](https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/)
