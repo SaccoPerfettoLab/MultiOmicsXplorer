@@ -9,7 +9,7 @@
 *It is completely free and does not require any registration.*
 
 🌐 **Web application**:  
-👉 [https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/](https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/)
+[https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/](https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/)
 
 ---
 
@@ -37,7 +37,7 @@ shiny::runApp()
 ## 3. Tutorial
 
 You can find the MultiOmicsXplorer tutorial at this link:
-👉 [https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/tutorial.html](https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/tutorial.html)
+[https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/tutorial.html](https://perfettolab.bio.uniroma1.it/MultiOmicsXplorer/tutorial.html)
 
 ## License
 
