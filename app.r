@@ -207,7 +207,7 @@ ui <- fluidPage(
                #### Analyte abundance panel ####
                tabPanel("Explore Analyte Abundance",
                         fluidRow(
-                          column(width = 4,  # Ridotto per lasciare più spazio al plot
+                          column(width = 4, 
                                  radioButtons(inputId = "data_type",
                                               label = "Select one 'omic' layer:",
                                               choices = c("Phosphoproteomics", "Proteomics", "Transcriptomics"),
@@ -277,11 +277,10 @@ ui <- fluidPage(
                                  )
                           ),
                           
-                          # La colonna contenente il plot
-                          column(width = 8,  # Più larga per il grafico
+                          column(width = 8,  
                                  box(
                                    width = 12, 
-                                   style = "height: 500px;",  # Set a specific height for the plot
+                                   style = "height: 500px;",
                                    withSpinner(
                                      plotOutput("combined_plot"),
                                      type = 4,
@@ -372,7 +371,7 @@ ui <- fluidPage(
                column(width = 8,
                       box(
                         width = 12,
-                        style = "height: 500px;",  # Set a specific height for the plot
+                        style = "height: 500px;",  
                         
                         withSpinner(
                           plotOutput("combined_plot_prot"),
@@ -432,11 +431,13 @@ ui <- fluidPage(
                             
                             hr(),
                             
-                            p("The following three sample dataframes are provided to illustrate the proper format for providing omics dataframes to input to SignalingProfiler."),
+                            p("The following three sample dataframes are provided to illustrate the proper format for providing omics 
+                              dataframes to input to SignalingProfiler."),
                             
                             p("To ensure analysis, the columns must be renamed as they are in the examples."),
                             
-                            p("All three omics dataframes can be loaded to initiate the analysis, or if one or two are missing, the analysis will be performed in the most optimal way based on the loaded dataframe(s)."),
+                            p("All three omics dataframes can be loaded to initiate the analysis, or if one or two are missing, 
+                              the analysis will be performed in the most optimal way based on the loaded dataframe(s)."),
                             
                             h4("Transcriptomics Data Example"),
                             tableOutput("example_transcriptomics"),
@@ -649,6 +650,7 @@ ui <- fluidPage(
                         )
                )
                )),
+    
     #### Help ####
     tabPanel("Help",
              fluidRow(
@@ -1160,7 +1162,6 @@ server <- function(input, output, session) {
     comparison_type <- input$comparison_type_protein
     analyte_option <- input$analyte_filter_prot
     
-    # Carica i dati
     data <- data_reactive_prot()
     req(data)  
     
@@ -1175,7 +1176,6 @@ server <- function(input, output, session) {
         return(NULL)
       }
       
-      # Filtro dei dati
       filtered_data <- if ("all" %in% stages) {
         data %>% filter(Name == protein, Tumor_Type %in% tumor_types, !grepl("\\.N$", Patient_ID))
       } else {
@@ -1193,7 +1193,6 @@ server <- function(input, output, session) {
       
       if (is.null(tumor_type)) return(NULL)
       
-      # Genera la tabella normale vs tumore
       filtered_data <- generate_table_norm_ac(data, protein, tumor_type, stages)
       
       if (is.null(filtered_data) || nrow(filtered_data) == 0) return(NULL)
