@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MultiOmicsXplorer - Tutorial</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #F5F5F5;
+      color: #333333;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center; /* Centra il contenuto orizzontalmente */
+    }
+    .container {
+      max-width: 900px; /* Imposta una larghezza massima per il contenuto */
+      width: 100%;
+    }
+    h1 {
+      color: #1A2448;
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+    h2 {
+      color: #1A2448;
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+    h3 {
+      color: #1A2448;
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .highlight {
+      font-weight: bold;
+      color: #1A2448;
+    }
+    .link {
+      color: #1A2448;
+    }
+    .image-container {
+      text-align: center;
+      margin-top: 10px;
+    }
+    img {
+      max-width: 70%;
+      height: auto;
+    }
+    ul {
+      margin: 0;
+      padding-left: 20px;
+      line-height: 1.5;
+    }
+    p {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Welcome to MultiOmicsXplorer - User Guide</h1>
+      <p>Learn how to use the features of the MultiOmicsXplorer app.</p>
+    </header>
+
+    <!-- Section 1: Introduction -->
+    <div class="section">
+      <h2>Introduction</h2>
+      <p>MultiOmicsXplorer is a tool for analyzing phosphoproteomic, proteomic, and transcriptomic data from various types of tumors. The app allows you to compare tumors at different stages and analyze molecular data across multiple layers of omics.</p>
+    </div>
+
+    <!-- Section 2: OncoXplorer-CPTAC Data Analysis -->
+    <div class="section">
+      <h2>OncoXplorer-CPTAC Data Analysis</h2>
+      <p>The <span class="highlight">OncoXplorer-CPTAC Data Analysis</span> section lets you compare tumor data from the <a href="https://proteomics.cancer.gov/programs/cptac" target="_blank" class="link">CPTAC portal</a> across various tumor types and stages.</p>
+      <div class="image-container">
+        <img src="MultiOmicsXplorer_home.png" alt="CPTAC Data Analysis">
+      </div>
+    </div>
+
+    <!-- Section 3: Extract Protein Activity -->
+    <div class="section">
+      <h2>Extract Protein Activity from Your Data</h2>
+      <p>This section allows you to use <span class="highlight">SignalingProfiler</span> to extract protein activity by uploading your own data.</p>
+    </div>
+
+    <!-- Section 4: OncoXplorer Features - Analyte Abundance -->
+    <div class="section">
+      <h2>Explore Analyte Abundance</h2>
+      <p>In this section, you can analyze the abundance of analytes from different 'omic' layers: Phosphoproteomics, Proteomics, or Transcriptomics. Choose your desired dataset and comparison type, then generate plots to visualize the results.</p>
+      <ul>
+        <li>Select an 'omic' layer (Phosphoproteomics, Proteomics, or Transcriptomics).</li>
+        <li>Choose a comparison type (Tumor vs Tumor or Tumor vs Normal).</li>
+        <li>Select one or more tumors and stages for your analysis.</li>
+      </ul>
+      <p>Click the <span class="highlight">Generate boxplot</span> button to visualize the data.</p>
+      <div class="image-container">
+        <img src="analyte_abundance.png" alt="Analyte Abundance Analysis">
+      </div>
+    </div>
+
+    <!-- Section 5: Protein Activity -->
+    <div class="section">
+      <h2>Explore Protein Activity</h2>
+      <p>The <span class="highlight">Protein Activity</span> section allows you to analyze protein activity and compare it between different tumors or stages. Select the protein, comparison type, and the relevant tumor and stage(s) to visualize protein activity.</p>
+      <ul>
+        <li>Choose a protein from the list.</li>
+        <li>Select the comparison type (Tumor vs Tumor or Tumor vs Normal).</li>
+        <li>Select one or more tumors and stages to compare.</li>
+      </ul>
+      <p>Click the <span class="highlight">Generate boxplot</span> button to view the results.</p>
+      <div class="image-container">
+        <img src="protein_activity.png" alt="Protein Activity Analysis">
+      </div>
+    </div>
+
+    <!-- SignalingProfiler Section -->
+    <div class="section">
+      <h2>SignalingProfiler</h2>
+      <p>The <span class="highlight">SignalingProfiler</span> tool enables the extraction of protein activity from your own data. Here, you'll learn how to upload your dataset, run the analysis, and interpret the results.</p>
+
+      <h3>About SignalingProfiler</h3>
+      <p><span class="highlight">SignalingProfiler</span> provides a method for inferring protein activity from proteomics, phosphoproteomics, and transcriptomics data. This tool calculates activity levels of transcription factors, kinases, phosphatases and other proteins, offering insights into signaling pathways and cellular activity.</p>
+
+      <h3>Steps to Use SignalingProfiler</h3>
+      <ul>
+        <li><strong>Upload Your Data:</strong> Choose the relevant data type (proteomics, phosphoproteomics, or transcriptomics) and upload your dataset.</li>
+         <li><strong>Select the Organism:</strong> Choose the organism you're working on between human and mouse.</li>
+        <li><strong>Choose Settings:</strong> Select analysis parameters (default or personalized).</li>
+        <li><strong>Run the Analysis:</strong> Once data is uploaded and settings are configured, click on the <span class="highlight">Run Analysis</span> button.</li>
+      </ul>
+
+      <h3>Example Data Format</h3>
+      <p>To run the analysis successfully, your data must follow the correct format:</p>
+      <ul>
+        <li><span class="highlight">Proteomics:</span> File with protein identifiers and corresponding intensity values.</li>
+        <li><span class="highlight">Phosphoproteomics:</span> File with phosphosite identifiers and phosphorylation levels.</li>
+        <li><span class="highlight">Transcriptomics:</span> File with gene identifiers and expression levels.</li>
+      </ul>
+      <div class="image-container">
+        <img src="sp_data_example.png" alt="Protein Activity Analysis">
+      </div>
+      
+      <p>You can upload your files, respecting the format of the names shown in the image. You can choose the default parameters used by SignalingProfiler or you can also personalize the parameters for the analysis.</p>
+     
+      <div class="image-container">
+        <img src="signaling_profiler_results.png" alt="SignalingProfiler Results">
+      </div>
+
+      <h3>Visualize Results</h3>
+      <p>Once the analysis is completed, you can visualize the results in a series of plots showing protein activity. The top proteins will be highlighted based on their inferred activity.</p>
+    </div>
+    
+    <div class="image-container">
+        <img src="sp_plot_result_example.png" alt="SignalingProfiler Results">
+      </div>
+
+    <footer>
+      <p>If you need more help, refer to the documentation or contact the development team at <a href="mailto:eleonorameo.hp@gmail.com" class="link">eleonorameo.hp@gmail.com</a>.</p>
+    </footer>
+  </div>
+</body>
+</html>
