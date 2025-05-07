@@ -520,7 +520,6 @@ ui <- fluidPage(
                                    
                                    actionButton("run_analysis", "Run Analysis", class = "btn-primary"),
                                    
-                                   # Bottone con tooltip custom
                                    tags$div(
                                      class = "tooltip-wrapper",
                                      actionButton("clear_data", "Clear Data", class = "btn-danger"),
@@ -529,7 +528,6 @@ ui <- fluidPage(
                                    )
                                  ),
                                  
-                                 # Messaggio sotto con icona info e stile più visibile
                                  tags$p(
                                    style = "font-size: 1.1em; margin-top: 10px; display: flex; align-items: center; gap: 8px;",
                                    icon("info-circle"),
