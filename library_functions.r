@@ -19,10 +19,8 @@ library(plumber)
 
 
 
-# Definire la mappa dei colori per gli stadi
 stage_colors <- c("1" = "#66c2a5", "2" = "#fc8d62", "3" = "#8da0cb", "4" = "#e78ac3")
 
-# Definire la mappa dei colori per i tumori
 tumor_colors <- c("Brca" = "#e06666", "Ccrcc" = "#f9cb9c", "Coad" = "#ffe599",
                    "Gbm" = "#76a5af", "Hnscc" = "#9fc5e8",
                   "Lscc" = "#8e7cc3", "Luad" = "#d5a6bd", "Ov" = "#d9ead3",
@@ -82,14 +80,12 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
         }
       }
       
-      # Prendi tutti gli stadi presenti nei dati filtrati
       available_stages <- data %>%
         filter(Name == gene, Tumor_Type %in% tumors, !grepl("\\.N$", Patient_ID)) %>%
         pull(Stage) %>%
         unique() %>%
         sort()
       
-      # Crea titolo con elenco degli stadi reali presenti
       title <- paste(
         "Analyte:", gene,
         "-", "Tumors:", paste(tumors, collapse = ", "),
@@ -175,7 +171,7 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
         valid_tumors <- unique(filtered_data$Tumor_Type[filtered_data$Tumor_Type %in% tumors])
         unique_stages <- unique(filtered_data$Stage)
         
-        # Se abbiamo un solo tumore ma più stadi, facciamo il confronto tra stadi
+        # One tumor - more stages
         if (length(valid_tumors) == 1 && length(unique_stages) > 1) {
           filtered_data$Tumor_Stage <- paste(filtered_data$Tumor_Type, filtered_data$Stage, sep = " - ")
           
@@ -193,10 +189,8 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
               plot.title = element_text(size = 12, face = "bold")
             )
           
-          # Generiamo tutte le possibili coppie di stadi
           comparisons <- combn(unique_stages, 2, simplify = FALSE)
           
-          # Filtriamo solo le coppie che hanno dati validi per entrambi gli stadi
           valid_comparisons <- comparisons[sapply(comparisons, function(x) {
             sum(filtered_data$Stage == x[1]) > 0 & sum(filtered_data$Stage == x[2]) > 0
           })]
@@ -210,7 +204,7 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
           }
         } 
         else if (length(valid_tumors) >= 2) {
-          # Se ci sono più tumori, confrontiamo i tumori per ogni stadio
+          # more tumors - comparison for each stage
           p <- ggplot(filtered_data, aes(x = Tumor_Type, y = z_score, fill = Tumor_Type)) +
             geom_boxplot() +
             facet_wrap(~Stage, scales = "fixed", nrow = 1) +
@@ -226,7 +220,6 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
               plot.title = element_text(size = 12, face = "bold")
             )
           
-          # Generiamo le coppie di tumori per ciascuno stadio separatamente
           for (stage in unique_stages) {
             stage_data <- filtered_data[filtered_data$Stage == stage, ]
             stage_tumors <- unique(stage_data$Tumor_Type)
@@ -234,7 +227,6 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
             if (length(stage_tumors) >= 2) {
               comparisons <- combn(stage_tumors, 2, simplify = FALSE)
               
-              # Filtriamo solo le coppie di tumori che hanno dati in quel particolare stadio
               valid_comparisons <- comparisons[sapply(comparisons, function(x) {
                 sum(stage_data$Tumor_Type == x[1]) > 0 & sum(stage_data$Tumor_Type == x[2]) > 0
               })]
@@ -318,13 +310,10 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
       }
       
       if (show_significance) {
-        # Filtra i tumori con dati validi (solo tumori presenti nel dataset)
         valid_tumors <- unique(filtered_data$Tumor_Type)
         
-        # Creiamo i confronti per ciascun tumore con "Normal"
         comparisons <- lapply(valid_tumors, function(tumor) c("Normal", tumor))
         
-        # Se ci sono confronti da fare, aggiungiamo il test di Wilcoxon
         if (length(comparisons) > 0) {
           p <- p + stat_compare_means(
             method = "wilcox.test",
@@ -368,7 +357,6 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
           plot.title = element_text(size = 12, face = "bold")
         )
       
-      # Aggiungiamo i punti se richiesto
       if (show_points) {
         p <- p + 
           geom_point(aes(fill = Sample_Type), 
@@ -377,19 +365,15 @@ generate_plot_abundance <- function(data, gene, tumors, stages, data_type,
       }
       
       if (show_significance) {
-        # Filtra i tumori che hanno effettivamente dati per ogni gruppo (Normal vs Tumor)
         valid_sample_types <- unique(filtered_data$Sample_Type)
         
-        # Se non ci sono dati sufficienti per eseguire il test, mostra un messaggio
         if (length(valid_sample_types) < 2) {
           message("Not enough valid sample types for significance testing.")
           return(NULL)
         }
         
-        # Crea la lista di confronti tra "Normal" e ogni tipo di Tumor per ogni stadio
         comparisons <- lapply(valid_sample_types[valid_sample_types != "Normal"], function(sample) c("Normal", sample))
         
-        # Se ci sono confronti da fare, esegui il test di Wilcoxon
         if (length(comparisons) > 0) {
           p <- p + stat_compare_means(
             method = "wilcox.test",
@@ -496,10 +480,8 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
         )
       
       if (show_significance && length(tumors) >= 2) {
-        # Verifica quali tumori hanno dati
         valid_tumors <- tumors[sapply(tumors, function(tumor) any(filtered_data$Tumor_Type == tumor))]
         
-        # Se ci sono almeno due tumori validi, esegui il test di Wilcoxon
         if (length(valid_tumors) >= 2) {
           p <- p + stat_compare_means(method = "wilcox.test", 
                                       comparisons = combn(valid_tumors, 2, simplify = FALSE), 
@@ -532,7 +514,7 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
         labs(title = title, x = "Tumor Type", y = "Predicted activity") +
         scale_fill_manual(values = tumor_colors) +
         theme_minimal() +
-        facet_wrap(~ Stage, nrow = 1) +  # Mostra tutti gli stadi selezionati
+        facet_wrap(~ Stage, nrow = 1) +  
         theme(
           legend.position = "none",
           axis.text.x = element_text(angle = 45, hjust = 1, size = 14),
@@ -547,7 +529,6 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
         unique_stages <- unique(filtered_data$Stage)
         
         if (length(valid_tumors) == 1 && length(unique_stages) > 1) {
-          # Caso con un solo tumore e più stadi: test di significatività tra gli stadi
           filtered_data$Tumor_Stage <- paste(filtered_data$Tumor_Type, filtered_data$Stage, sep = " - ")
           
           p <- ggplot(filtered_data, aes(x = Tumor_Stage, y = predicted_activity, fill = Tumor_Type)) +
@@ -566,13 +547,10 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
           
           comparisons <- combn(unique(filtered_data$Tumor_Stage), 2, simplify = FALSE)
           
-          # Filtra le combinazioni di stadi in modo che non vengano escluse se non hanno dati
           valid_comparisons <- comparisons[sapply(comparisons, function(x) {
-            # Se una combinazione di stadi non ha dati, la consideriamo comunque
             sum(filtered_data$Tumor_Stage == x[1]) > 0 | sum(filtered_data$Tumor_Stage == x[2]) > 0
           })]
           
-          # Se ci sono combinazioni valide (anche incomplete)
           if (length(valid_comparisons) > 0) {
             p <- p + stat_compare_means(method = "wilcox.test", 
                                         comparisons = valid_comparisons, 
@@ -582,7 +560,6 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
           }
         } 
         else if (length(valid_tumors) >= 2) {
-          # Se ci sono più tumori, confrontiamo i tumori per ogni stadio
           p <- ggplot(filtered_data, aes(x = Tumor_Type, y = predicted_activity, fill = Tumor_Type)) +
             geom_boxplot() +
             facet_wrap(~Stage, scales = "fixed", nrow = 1) +
@@ -598,7 +575,6 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
               plot.title = element_text(size = 12, face = "bold")
             )
           
-          # Generiamo le coppie di tumori per ciascuno stadio separatamente
           for (stage in unique_stages) {
             stage_data <- filtered_data[filtered_data$Stage == stage, ]
             stage_tumors <- unique(stage_data$Tumor_Type)
@@ -606,7 +582,6 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
             if (length(stage_tumors) >= 2) {
               comparisons <- combn(stage_tumors, 2, simplify = FALSE)
               
-              # Filtriamo solo le coppie di tumori che hanno dati in quel particolare stadio
               valid_comparisons <- comparisons[sapply(comparisons, function(x) {
                 sum(stage_data$Tumor_Type == x[1]) > 0 & sum(stage_data$Tumor_Type == x[2]) > 0
               })]
@@ -681,13 +656,10 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
       }
       
       if (show_significance) {
-        # Filtra i tumori con dati validi (solo tumori presenti nel dataset)
         valid_tumors <- unique(filtered_data$Tumor_Type)
         
-        # Creiamo i confronti per ciascun tumore con "Normal"
         comparisons <- lapply(valid_tumors, function(tumor) c("Normal", tumor))
         
-        # Se ci sono confronti da fare, aggiungiamo il test di Wilcoxon
         if (length(comparisons) > 0) {
           p <- p + stat_compare_means(
             method = "wilcox.test",
@@ -723,7 +695,6 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
           plot.title = element_text(size = 12, face = "bold")
         )
       
-      # Aggiungiamo i punti se richiesto
       if (show_points_protein) {
         p <- p + 
           geom_point(aes(fill = Sample_Type), 
@@ -732,19 +703,15 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
       }
       
       if (show_significance) {
-        # Filtra i tumori che hanno effettivamente dati per ogni gruppo (Normal vs Tumor)
         valid_sample_types <- unique(filtered_data$Sample_Type)
         
-        # Se non ci sono dati sufficienti per eseguire il test, mostra un messaggio
         if (length(valid_sample_types) < 2) {
           message("Not enough valid sample types for significance testing.")
           return(NULL)
         }
         
-        # Crea la lista di confronti tra "Normal" e ogni tipo di Tumor per ogni stadio
         comparisons <- lapply(valid_sample_types[valid_sample_types != "Normal"], function(sample) c("Normal", sample))
         
-        # Se ci sono confronti da fare, esegui il test di Wilcoxon
         if (length(comparisons) > 0) {
           p <- p + stat_compare_means(
             method = "wilcox.test",
@@ -771,10 +738,9 @@ generate_table_norm_ab <- function(data, gene, tumor_type, stage, analyte_option
     filter(Name == gene) %>%
     mutate(Type = if_else(grepl("\\.N$", Patient_ID), "Normal", "Tumor"))  
   
-  # Seleziona solo il tumore specifico, sia per tumorali che per Normal associati a quel tumore
   tumor_data <- tumor_data %>%
     filter(
-      Tumor_Type %in% as.character(tumor_type),  # Filtra per il tumore selezionato
+      Tumor_Type %in% as.character(tumor_type), 
       Type == "Normal" | (Type == "Tumor" & (is.na(Stage) | "all" %in% stage | Stage %in% stage))
     )
   
@@ -811,29 +777,23 @@ library(readr)
 query_ptm_residue <- function(uniprot_id, protein_name, residue) {
   base_url <- "https://signor.uniroma2.it/PhosphoSIGNOR/apis/residueSearch.php"
   
-  # 🔹 Query API con UniProt ID e residuo
   response <- GET(base_url, query = list(id = uniprot_id, residue = residue))
   
-  # 🔹 Verifica se la richiesta è andata a buon fine
   if (http_error(response)) {
     cat("Error: Unable to connect to SIGNOR API.\n")
     return(NULL)
   }
   
-  # 🔹 Controlla il contenuto della risposta
   result <- content(response, as = "text", encoding = "UTF-8")
-  print(result)  # DEBUG: stampiamo la risposta per capire se ci sono problemi
+  print(result) 
   
-  # 🔹 Se il risultato contiene "No result found!", esci
   if (grepl("No result found!", result)) {
     cat("Residue not found in SIGNOR database.\n")
     return(NULL)
   }
   
-  # 🔹 Crea l'ID formattato per il network (UniProtID_Proteina_Residuo)
   formatted_id <- paste0(uniprot_id, "_", protein_name, "_", residue)
   
-  # 🔹 Crea l'URL per la query
   network_url <- paste0("https://signor.uniroma2.it/PhosphoSIGNOR/results/entity.php?role=residue&ID=", formatted_id)
   
   return(network_url)
