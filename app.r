@@ -7,6 +7,7 @@ ui <- fluidPage(
   title = "MultiOmicsXplorer",
   useShinyjs(),
   tags$head(
+    tags$title("MultiOmicsXplorer"),
     tags$style(HTML("
       body {background-color: #F5F5F5;} 
       .logo-container {text-align: center; margin-top: 20px; margin-bottom: 5px;} 
