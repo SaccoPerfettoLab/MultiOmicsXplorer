@@ -1278,7 +1278,7 @@ server <- function(input, output, session) {
   #### Upload data for SP analysis ####
   sample_data_list <- reactiveVal(list())
   
-  # Create session-specific temp file path
+  # Create session-specific temp file path -> this is important to not overlap analyses!!!
   user_temp_dir <- tempdir()
   file_path <- file.path(user_temp_dir, paste0("user_data_", as.integer(Sys.time()), "_", sample(1000:9999, 1), ".rds"))
 

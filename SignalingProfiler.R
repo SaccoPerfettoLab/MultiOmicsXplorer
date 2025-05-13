@@ -3,6 +3,7 @@ library(dplyr)
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
+
 #### READ UPLOADED FILES ####
 
 read_data <- function(filepath) {
@@ -10,8 +11,8 @@ read_data <- function(filepath) {
   
   switch(ext,
          csv = {
-           # Read the first line to guess the delimiter
-           first_line <- readLines(filepath, n = 1)
+          
+           first_line <- readLines(filepath, n = 1) # read first line to guess delimiter -> cause can be csv or csv2!!
            
            if (grepl(";", first_line)) {
              readr::read_csv2(filepath)  # semicolon-separated
@@ -27,6 +28,7 @@ read_data <- function(filepath) {
 }
 
 #### Manage NA character problem ####
+# suggested by vero to manage if the na is character
 normalize_na <- function(df) {
   df[] <- lapply(df, function(col) {
     if (is.character(col)) {
@@ -37,7 +39,7 @@ normalize_na <- function(df) {
   return(df)
 }
 
-#### RUN ANALYSIS
+#### RUN ANALYSIS ####
 perform_analysis <- function(trans_data = NULL, prot_data = NULL, phospho_data = NULL, params, sample_id) {
 
   organism <- params$organism
@@ -87,10 +89,11 @@ perform_analysis <- function(trans_data = NULL, prot_data = NULL, phospho_data =
   }
   
   if (!is.null(Phospho_P)) {
-    
+     ## partial cleaning
     Phospho_P <- Phospho_P %>%
-      filter(aminoacid %in% c("S", "T", "Y")) %>%
-      distinct(UNIPROT, aminoacid, position, .keep_all = TRUE)
+      filter(aminoacid %in% c("S", "T", "Y")) %>% ## if there are aminoacids that are not T, Y ans S, the rows containing them will be deleted
+      distinct(UNIPROT, aminoacid, position, .keep_all = TRUE) # it mantains only one row per uniprot-aminoacid_position combination -> this could be not correct if a gene_name 
+                                                              # as the wrong uniprot cause it mantains the first occurrance 
     
     kin_args <- list(
       omic_data = Phospho_P, 
@@ -128,8 +131,8 @@ perform_analysis <- function(trans_data = NULL, prot_data = NULL, phospho_data =
     } else {  
       phosphoscore_1 <- if (!all(is.null(Phospho_P$sequence_window))) {
         SignalingProfiler::phosphoscore_computation(
-          phosphoproteomic_data = Phospho_P, organism = 'hybrid', 
-          activatory = params$activatory, GO_annotation = params$GO_annotation_phospho,blastp_path = "/Users/eleonorameo/bin/ncbi-blast-2.16.0+/bin/blastp" #re-write with your blastp path
+          phosphoproteomic_data = Phospho_P, organism = 'hybrid', ## to allineate the sequence on human sequences
+          activatory = params$activatory, GO_annotation = params$GO_annotation_phospho,blastp_path = "/Users/eleonorameo/bin/ncbi-blast-2.16.0+/bin/blastp" #re-write if blastp path change
         )
       } else {
         SignalingProfiler::phosphoscore_computation_aapos(
@@ -197,6 +200,7 @@ perform_analysis <- function(trans_data = NULL, prot_data = NULL, phospho_data =
                                 method = character(), Sample_ID = character())
   }
   
+  ## create the table with the molecular function summary
   molecular_function_summary <- if (nrow(final_results) > 0 && "mf" %in% colnames(final_results)) {
     final_results %>%
       group_by(Sample_ID) %>%
@@ -223,8 +227,7 @@ create_top_proteins_plot <- function(results_df, sample_id = NULL) {
 
   if (!is.null(sample_id)) {
     cat("Filtering for Sample ID:", sample_id, "\n")
-    results_df <- results_df %>% filter(Sample_ID == !!sample_id)  # Cambiato da sample_id a Sample_ID
-    
+    results_df <- results_df %>% filter(Sample_ID == !!sample_id)  
     cat("Rows after filtering:", nrow(results_df), "\n")
   }
   
@@ -260,6 +263,9 @@ create_top_proteins_plot <- function(results_df, sample_id = NULL) {
     }
   }
   
+  
+  # re-writed to be similar to the plot of signaling profiler tutorial
+  # vertical plot
   plot <- ggplot(top_proteins, aes(x = reorder(gene_name, predicted_activity), 
                                    y = predicted_activity, 
                                    fill = predicted_activity)) +
@@ -316,8 +322,7 @@ check_columns <- function(data, omic_type) {
     return(FALSE)
   }
 
-  # Check for missing required columns
-  missing_cols <- setdiff(required_cols, colnames(data))
+  missing_cols <- setdiff(required_cols, colnames(data)) # check if there's not the right columns
 
   if (length(missing_cols) > 0) {
     return(paste("The input table must include at least the following columns for", omic_type, "data: ",

@@ -1,4 +1,5 @@
-# To run MultiOmicsXplorer is necessary to install all the following packages.
+# if you download this demo version for local:
+# To run MultiOmicsXplorer is necessary to install all the following packages
 # Use this code to have all the packages installed! When you'll run the application the libraries 
 # will be uploaded automatically
 
@@ -21,7 +22,9 @@ required_packages <- c(
   "shinyjs",
   "DT",
   "openxlsx",
-  "plumber"
+  "plumber",
+  "readr",
+  "httr"
 )
 
 # install missing CRAN packages
@@ -33,7 +36,7 @@ for (pkg in required_packages) {
   }
 }
 
-# install SignalingProfiler from GitHub if not already installed
+# install SignalingProfiler from GitHub if not already installed -> this is necessary for the 
 if (!"SignalingProfiler" %in% installed) {
   if (!"devtools" %in% installed) install.packages("devtools")
   devtools::install_github('https://github.com/SaccoPerfettoLab/SignalingProfiler/')

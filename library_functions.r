@@ -16,9 +16,12 @@ library(shinyjs)
 library(DT)
 library(openxlsx)
 library(plumber)
+library(httr)
+library(readr) 
 
 
 
+# color mapping for the plots 
 stage_colors <- c("1" = "#66c2a5", "2" = "#fc8d62", "3" = "#8da0cb", "4" = "#e78ac3")
 
 tumor_colors <- c("Brca" = "#e06666", "Ccrcc" = "#f9cb9c", "Coad" = "#ffe599",
@@ -45,9 +48,11 @@ load_data <- function(data_type, gene) {
   
   gene_list <- readr::read_tsv(genes_file)$gene_name
   
-  gene_letter <- substr(gene, 1, 1)
+  gene_letter <- substr(gene, 1, 1) ## it takes the first letter of the name of the analyte cause files 
+                                    ## are divided per first letter
   
-  file_name <- paste0("Gene_expression/", data_type_prefix, "_data_", gene_letter, ".tsv")
+  file_name <- paste0("Gene_expression/", data_type_prefix, "_data_", gene_letter, ".tsv") ## Gene_expression is the folder containing all 
+                                                                                           ## the files of analyte abundance 
   
   cat("File path:", file_name, "\n")
   if (fs::file_exists(file_name)) {
@@ -59,6 +64,8 @@ load_data <- function(data_type, gene) {
 }
 
 #### ABUNDANCE PLOT GENERATION ####
+
+# all the combination are managed to have: tum vs tum with >=1 stages; tum in >1 stages; tum vs norm in all (average) or >1 stages
 generate_plot_abundance <- function(data, gene, tumors, stages, data_type, 
                                     comparison_type, analyte_option = "all", 
                                     show_points = FALSE, show_significance = FALSE) {
@@ -435,12 +442,14 @@ load_data_protein <- function(protein) {
 }
 
 #### PROTEIN ACTIVITY GENERATION PLOT ####
+
+# all the combination are managed to have: tum vs tum with >=1 stages; tum in >1 stages; tum vs norm in all (average) or >1 stages
 generate_plot_protein_activity <- function(data, protein, tumors, stages, 
                                            comparison_type_prot, 
                                            show_points_protein = FALSE, 
                                            show_significance = FALSE) {
   
-  if (comparison_type_prot == "Tumor vs Tumor") {
+  if (comparison_type_prot == "Tumor vs Tumor") {.  
     
     if ("all" %in% stages) {
       filtered_data <- data %>%
@@ -479,6 +488,7 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
           plot.title = element_text(size = 12, face = "bold")
         )
       
+      ## here we have the wilcox test between tumors in the all option
       if (show_significance && length(tumors) >= 2) {
         valid_tumors <- tumors[sapply(tumors, function(tumor) any(filtered_data$Tumor_Type == tumor))]
         
@@ -528,7 +538,8 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
         valid_tumors <- unique(filtered_data$Tumor_Type[filtered_data$Tumor_Type %in% tumors])
         unique_stages <- unique(filtered_data$Stage)
         
-        if (length(valid_tumors) == 1 && length(unique_stages) > 1) {
+        ## comparison between stages if one tumor selected
+        if (length(valid_tumors) == 1 && length(unique_stages) > 1) { # es brca 1-2-3-4
           filtered_data$Tumor_Stage <- paste(filtered_data$Tumor_Type, filtered_data$Stage, sep = " - ")
           
           p <- ggplot(filtered_data, aes(x = Tumor_Stage, y = predicted_activity, fill = Tumor_Type)) +
@@ -551,6 +562,7 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
             sum(filtered_data$Tumor_Stage == x[1]) > 0 | sum(filtered_data$Tumor_Stage == x[2]) > 0
           })]
           
+          ## wilcox for the same tumor in more stages, es brca-1 vs brca-2 / brca-1 vs brca-3 etc
           if (length(valid_comparisons) > 0) {
             p <- p + stat_compare_means(method = "wilcox.test", 
                                         comparisons = valid_comparisons, 
@@ -560,6 +572,8 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
           }
         } 
         else if (length(valid_tumors) >= 2) {
+          
+          ## comparison with tumors and stages, es Brca, Ccrcc, Coad and stages 1,2,3
           p <- ggplot(filtered_data, aes(x = Tumor_Type, y = predicted_activity, fill = Tumor_Type)) +
             geom_boxplot() +
             facet_wrap(~Stage, scales = "fixed", nrow = 1) +
@@ -585,7 +599,8 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
               valid_comparisons <- comparisons[sapply(comparisons, function(x) {
                 sum(stage_data$Tumor_Type == x[1]) > 0 & sum(stage_data$Tumor_Type == x[2]) > 0
               })]
-              
+               
+            ## wilcox between tumors in each stage selected
               if (length(valid_comparisons) > 0) {
                 p <- p + stat_compare_means(method = "wilcox.test", 
                                             comparisons = valid_comparisons, 
@@ -605,7 +620,7 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
                      position = position_jitter(width = 0.2, height = 0), size = 1.5, alpha = 0.8, 
                      shape = 21, color = "#000000", stroke = 0.5)
       } 
-    } # End Tumor vs Tumor block
+    } # end "Tumor vs Tumor" block -> start with "Tumor vs Normal"
     
   }else if (comparison_type_prot== "Tumor vs Normal") {
     
@@ -633,7 +648,7 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
       title <- paste0("Protein: ", protein, 
                       " – Tumor: ", paste(tumors, collapse = ", "), 
                       " – Stages: All (", paste(available_stages, collapse = ", "), ")")    
-      
+      ## all stages for the 1 tumor vs normal
       p <- ggplot(filtered_data, aes(x = Sample_Type, y = predicted_activity, fill = Sample_Type)) +
         geom_boxplot() +
         labs(title = title, x = "Sample Type", y = "Predicted activity") +
@@ -657,7 +672,7 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
       
       if (show_significance) {
         valid_tumors <- unique(filtered_data$Tumor_Type)
-        
+         ## wilcox all vs normal
         comparisons <- lapply(valid_tumors, function(tumor) c("Normal", tumor))
         
         if (length(comparisons) > 0) {
@@ -706,7 +721,7 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
         valid_sample_types <- unique(filtered_data$Sample_Type)
         
         if (length(valid_sample_types) < 2) {
-          message("Not enough valid sample types for significance testing.")
+          message("Not enough valid sample types for significance testing.") # if there's not at least 2 valid sample the comparison is not possible
           return(NULL)
         }
         
@@ -732,7 +747,8 @@ generate_plot_protein_activity <- function(data, protein, tumors, stages,
 
 
 #### TABLES GENERATION ####
-# Function to generate table for analyte abundance
+
+#### Abund norm ####
 generate_table_norm_ab <- function(data, gene, tumor_type, stage, analyte_option = "all") {
   tumor_data <- data %>%
     filter(Name == gene) %>%
@@ -751,7 +767,7 @@ generate_table_norm_ab <- function(data, gene, tumor_type, stage, analyte_option
   return(tumor_data)
 }
 
-# Function to generate table for protein activity
+#### Prot act norm ####
 generate_table_norm_ac <- function(data, protein, tumor_type, stage = "all") {
   tumor_data <- data %>%
     filter(Name == protein) %>%
@@ -770,14 +786,12 @@ generate_table_norm_ac <- function(data, protein, tumor_type, stage = "all") {
 
 
 
-#### QUERY TO INTERROGATE SIGNOR AND TO CREATE THE LINK FOR PTM ####
-library(httr)
-library(readr)  
-
+#### QUERY TO INTERROGATE SIGNOR AND TO CREATE THE LINK FOR PHOSPHOSIGNOR ####
+ 
 query_ptm_residue <- function(uniprot_id, protein_name, residue) {
   base_url <- "https://signor.uniroma2.it/PhosphoSIGNOR/apis/residueSearch.php"
   
-  response <- GET(base_url, query = list(id = uniprot_id, residue = residue))
+  response <- GET(base_url, query = list(id = uniprot_id, residue = residue)) 
   
   if (http_error(response)) {
     cat("Error: Unable to connect to SIGNOR API.\n")
@@ -794,7 +808,7 @@ query_ptm_residue <- function(uniprot_id, protein_name, residue) {
   
   formatted_id <- paste0(uniprot_id, "_", protein_name, "_", residue)
   
-  network_url <- paste0("https://signor.uniroma2.it/PhosphoSIGNOR/results/entity.php?role=residue&ID=", formatted_id)
+  network_url <- paste0("https://signor.uniroma2.it/PhosphoSIGNOR/results/entity.php?role=residue&ID=", formatted_id) # remember to check sometimes if the name/link of the resource has been changed
   
   return(network_url)
 }
