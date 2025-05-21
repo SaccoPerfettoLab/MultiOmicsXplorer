@@ -343,7 +343,7 @@ ui <- fluidPage(
                         selectizeInput(
                           "tumors_prot",
                           "Select one tumor:",
-                          choices = c("Ccrcc", "Coad", "Gbm", "Hnscc", "Lscc", "Luad", "Pdac", "Ucec", "all"),
+                          choices = c("Ccrcc", "Coad", "Gbm", "Hnscc", "Lscc", "Luad", "Ov", "Pdac", "Ucec", "all"),
                           multiple = FALSE
                         ),
                         selectizeInput(
