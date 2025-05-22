@@ -761,9 +761,8 @@ server <- function(input, output, session) {
   
   
   #### Generation plot abundance ####
-  p <- reactive({
-    req(input$generate_plot)
-   
+  p <- eventReactive(input$generate_plot,{
+    
     shinyjs::addClass(id = "generate_plot", class = "clicked")
     
     shinyjs::delay(1000, {
@@ -1058,8 +1057,7 @@ server <- function(input, output, session) {
   })
   
   #### Generation plot protein activity ####
-  p_prot <- reactive({
-    req(input$generate_protact_plot)  
+  p_prot <- eventReactive(input$generate_protact_plot,{
     
     shinyjs::addClass(id = "generate_protact_plot", class = "clicked")
     
